@@ -1,31 +1,80 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Working with big data";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+@section Scripts {
+    @Scripts.Render("~/Scripts/jquery.signalR-2.1.2.min.js")
+    @Scripts.Render("~/signalr/hubs")
+
+    <script type="text/javascript">
+        $(function () {
+
+            // Reference the auto-generated proxy for the hub.  
+            const chat = $.connection.currencyRateHub;
+
+            // Create a function that the hub can call back to display messages.
+            chat.client.updateCurrencyRates = updateCurrencyRates;
+
+            let newActicleCount = 0;
+            chat.client.onArticleCreated = () => {
+                newArticleCount++;
+                $('#show-more-button').css('visibility', 'visible');
+            }
+
+            // Start the connection.
+            $.connection.hub.start().done(() => {
+                const rates = chat.server.getCurrencyRates();
+                updateCurrencyRates(rates);
+
+                $('#show-more-button').click(() => {
+                    newArticleCount = 0;
+                    $('#show-more-button').css('visibility', 'hidden');
+                    // TODO: load data
+                })
+            });
+        });
+
+        function updateCurrencyRates(rates) {
+            const element = $('#currency-rates');
+            element.empty();    
+            for (let rate of rates) {
+                $('<tr>')
+                    .addClass('currency-rate')
+                    .appendTo(element)
+                    .append($('<td>').text(rate.name).addClass('rate-cell'))
+                    .append($('<td>').text(rate.rate.toFixed(4)).addClass('rate-cell'));
+            }
+        }
+        
+        function htmlEncode(value) {
+            var encodedValue = $('<div />').text(value).html();
+            return encodedValue;
+        }
+        
+    </script>
+}
 
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+    <div class="col-md-8">
+        <h2>News feed</h2>
+        <div id="show-more-button"><a>Show recent</a></div>
+        <p>generate news feed here</p>
     </div>
     <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+        <div id="new-article">
+            <!-- generate a form for a new article here-->
+        </div>
+        <div>
+            Currency rates<br /><br />
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                <tbody id="currency-rates"></tbody>
+                <!--generate rates here-->
+            </table>
+        </div>
+        
     </div>
 </div>

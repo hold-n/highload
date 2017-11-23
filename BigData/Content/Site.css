@@ -22,3 +22,11 @@ select,
 textarea {
     max-width: 280px;
 }
+
+#show-more-button {
+    visibility: hidden;
+}
+
+.rate-cell {
+    padding: 5px;
+}
